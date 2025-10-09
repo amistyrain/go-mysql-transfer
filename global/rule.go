@@ -121,6 +121,12 @@ type Rule struct {
 	ElsType    string       `yaml:"es_type"`     //es6.x以后一个Index只能拥有一个Type,可以为空，默认使用_doc; es7.x版本此属性无效
 	EsMappings []*EsMapping `yaml:"es_mappings"` //Elasticsearch mappings映射关系,可以为空，为空时根据数据类型自己推导
 
+	// ------------------- MEILISEARCH -----------------
+	MeilisearchIndex           string `yaml:"meilisearch_index"`             //MeiliSearch Index名称,可以为空，默认使用表(Table)名称
+	MeilisearchPrimaryKey      string `yaml:"meilisearch_primary_key"`       //MeiliSearch主键字段,可以为空，默认使用数据库主键
+	MeilisearchSearchableAttrs string `yaml:"meilisearch_searchable_attrs"`  //MeiliSearch可搜索字段,用逗号分隔,可以为空，默认全部字段可搜索
+	MeilisearchFilterableAttrs string `yaml:"meilisearch_filterable_attrs"`  //MeiliSearch可过滤字段,用逗号分隔,可以为空
+
 	// --------------- no config ----------------
 	TableInfo             *schema.Table
 	TableColumnSize       int
@@ -283,6 +289,12 @@ func (s *Rule) Initialize() error {
 		}
 	}
 
+	if _config.IsMeilisearch() {
+		if err := s.initMeilisearchConfig(); err != nil {
+			return err
+		}
+	}
+
 	if _config.IsScript() {
 		if s.LuaScript == "" && s.LuaFilePath == "" {
 			return errors.New("empty lua script not allowed")
@@ -329,6 +341,12 @@ func (s *Rule) AfterUpdateTableInfo() error {
 
 	if _config.IsEls() {
 		if err := s.initElsConfig(); err != nil {
+			return err
+		}
+	}
+
+	if _config.IsMeilisearch() {
+		if err := s.initMeilisearchConfig(); err != nil {
 			return err
 		}
 	}
@@ -612,6 +630,14 @@ func (s *Rule) initKafkaConfig() error {
 		if s.KafkaTopic == "" {
 			s.KafkaTopic = s.Table
 		}
+	}
+
+	return nil
+}
+
+func (s *Rule) initMeilisearchConfig() error {
+	if s.MeilisearchIndex == "" {
+		s.MeilisearchIndex = s.Table
 	}
 
 	return nil

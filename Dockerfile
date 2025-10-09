@@ -1,4 +1,4 @@
-FROM golang:1.14 as compiler
+FROM golang:1.17 as compiler
 
 ENV GO111MODULE=on \
     GOPROXY=https://goproxy.cn,direct

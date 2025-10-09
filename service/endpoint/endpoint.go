@@ -80,6 +80,10 @@ func NewEndpoint(ds *canal.Canal) Endpoint {
 		}
 	}
 
+	if cfg.IsMeilisearch() {
+		return newMeilisearchEndpoint()
+	}
+
 	if cfg.IsScript() {
 		return newScriptEndpoint()
 	}
