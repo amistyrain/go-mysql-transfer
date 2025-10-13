@@ -1,9 +1,9 @@
 # mysql配置
-addr: 127.0.0.1:3306
+addr: host.docker.internal:3306
 user: root
 pass: 123456
 charset : utf8
-slave_id: 1001 #slave ID
+slave_id: 1002 #slave ID
 flavor: mysql #mysql or mariadb,默认mysql
 
 #系统相关配置
@@ -54,7 +54,7 @@ target: meilisearch # 支持redis、mongodb、elasticsearch、meilisearch、rock
 #es_password:  # 密码
 
 #meilisearch连接配置
-meilisearch_host: http://127.0.0.1:7700 #MeiliSearch主机地址
+meilisearch_host: host.docker.internal:7700 #MeiliSearch主机地址
 meilisearch_api_key:  #MeiliSearch API密钥，可以为空
 
 #rocketmq连接配置
@@ -76,7 +76,7 @@ meilisearch_api_key:  #MeiliSearch API密钥，可以为空
 rule:
   -
     schema: ad_hw #数据库名称
-    table: conf #表名称
+    table: test_conf #表名称
     order_by_column: id #排序字段，存量数据同步时不能为空
     #column_lower_case:false #列名称转为小写,默认为false
     #column_upper_case:false#列名称转为大写,默认为false
@@ -92,7 +92,7 @@ rule:
     #lua_script:   #lua 脚本
     value_encoder: json  #值编码，支持json、kv-commas、v-commas；默认为json
     #value_formatter: '{{.ID}}|{{.USER_NAME}}' # 值格式化表达式，如：{{.ID}}|{{.USER_NAME}},{{.ID}}表示ID字段的值、{{.USER_NAME}}表示USER_NAME字段的值
-    meilisearch_index: conf_01 #MeiliSearch索引名称,可以为空，默认使用表(Table)名称
+    meilisearch_index: test_conf_index #MeiliSearch索引名称,可以为空，默认使用表(Table)名称
     meilisearch_primary_key: id #MeiliSearch主键字段,可以为空，默认使用数据库主键
     meilisearch_searchable_attrs:  #MeiliSearch可搜索字段,用逗号分隔,可以为空，默认全部字段可搜索
     meilisearch_filterable_attrs:  #MeiliSearch可过滤字段,用逗号分隔,可以为空

@@ -1,0 +1,30 @@
+services:
+  # go-mysql-transfer主应用
+  go-mysql-transfer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-mysql-transfer-app
+    ports:
+      - "8060:8060"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # 挂载配置文件
+      - ./app.yml:/app/app.yml:ro
+      # 挂载日志目录
+      - ./store/log:/app/store/log
+      # 挂载数据库文件目录
+      - ./store/db:/app/store/db
+      # 可选：挂载自定义lua脚本目录
+      - ./lua:/app/lua
+    restart: unless-stopped
+    # network_mode: host  # 直接使用宿主机网络
+    environment:
+      TZ: Asia/Shanghai
+    healthcheck:
+      test: ["CMD", "sh", "-c", "ps aux | grep transfer | grep -v grep || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
