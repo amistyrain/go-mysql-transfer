@@ -1,15 +1,15 @@
 # mysql配置
-addr: 127.0.0.1:3306
+addr: host.docker.internal:3306
 user: root
-pass: root
+pass: 123456
 charset : utf8
-slave_id: 1001 #slave ID
+slave_id: 1002 #slave ID
 flavor: mysql #mysql or mariadb,默认mysql
 
 #系统相关配置
 #data_dir: D:\\transfer #应用产生的数据存放地址，包括日志、缓存数据等，默认当前运行目录下store文件夹
-#logger:
-#  level: info #日志级别；支持：debug|info|warn|error，默认info
+logger:
+ level: debug #日志级别；支持：debug|info|warn|error，默认info
 
 #maxprocs: 50 #并发协（线）程数量，默认为: CPU核数*2；一般情况下不需要设置此项
 #bulk_size: 1000 #每批处理数量，不写默认100，可以根据带宽、机器性能等调整;如果是全量数据初始化时redis建议设为1000，其他接收端酌情调大
@@ -19,7 +19,7 @@ flavor: mysql #mysql or mariadb,默认mysql
 #exporter_addr: 9595 #prometheus exporter端口，默认9595
 
 #web admin相关配置
-enable_web_admin: true #是否启用web admin，默认false
+enable_web_admin: false #是否启用web admin，默认false
 web_admin_port: 8060 #web监控端口,默认8060
 
 #cluster: # 集群相关配置
@@ -32,11 +32,11 @@ web_admin_port: 8060 #web监控端口,默认8060
   #etcd_user: test #etcd用户名
   #etcd_password: 123456 #etcd密码
 
-#目标类型
-target: redis # 支持redis、mongodb、elasticsearch、rocketmq、kafka、rabbitmq
+#目标类型  
+target: meilisearch # 支持redis、mongodb、elasticsearch、meilisearch、rocketmq、kafka、rabbitmq
 
 #redis连接配置
-redis_addrs: 127.0.0.1:6379 #redis地址，多个用逗号分隔
+# redis_addrs: 127.0.0.1:6379 #redis地址，多个用逗号分隔
 #redis_group_type: cluster   # 集群类型 sentinel或者cluster
 #redis_master_name: mymaster # Master节点名称,如果group_type为sentinel则此项不能为空，为cluster此项无效
 #redis_pass: 123456 #redis密码
@@ -50,8 +50,12 @@ redis_addrs: 127.0.0.1:6379 #redis地址，多个用逗号分隔
 #elasticsearch连接配置
 #es_addrs: 127.0.0.1:9200 #连接地址，多个用逗号分隔
 #es_version: 7 # Elasticsearch版本，支持6和7、默认为7
-#es_password:  # 用户名
-#es_version:  # 密码
+#es_user:  # 用户名
+#es_password:  # 密码
+
+#meilisearch连接配置
+meilisearch_host: host.docker.internal:7700 #MeiliSearch主机地址
+meilisearch_api_key:  #MeiliSearch API密钥，可以为空
 
 #rocketmq连接配置
 #rocketmq_name_servers: 127.0.0.1:9876 #rocketmq命名服务地址，多个用逗号分隔
@@ -71,12 +75,12 @@ redis_addrs: 127.0.0.1:6379 #redis地址，多个用逗号分隔
 #规则配置
 rule:
   -
-    schema: eseap #数据库名称
-    table: t_user #表名称
-    #order_by_column: id #排序字段，存量数据同步时不能为空
+    schema: ad_hw #数据库名称
+    table: test_conf #表名称
+    order_by_column: id #排序字段，存量数据同步时不能为空
     #column_lower_case:false #列名称转为小写,默认为false
     #column_upper_case:false#列名称转为大写,默认为false
-    column_underscore_to_camel: true #列名称下划线转驼峰,默认为false
+    # column_underscore_to_camel: true #列名称下划线转驼峰,默认为false
     # 包含的列，多值逗号分隔，如：id,name,age,area_id  为空时表示包含全部列
     #include_columns: ID,USER_NAME,PASSWORD
     #exclude_columns: BIRTHDAY,MOBIE # 排除掉的列，多值逗号分隔，如：id,name,age,area_id  默认为空
@@ -88,9 +92,13 @@ rule:
     #lua_script:   #lua 脚本
     value_encoder: json  #值编码，支持json、kv-commas、v-commas；默认为json
     #value_formatter: '{{.ID}}|{{.USER_NAME}}' # 值格式化表达式，如：{{.ID}}|{{.USER_NAME}},{{.ID}}表示ID字段的值、{{.USER_NAME}}表示USER_NAME字段的值
-
+    meilisearch_index: test_conf_index #MeiliSearch索引名称,可以为空，默认使用表(Table)名称
+    meilisearch_primary_key: id #MeiliSearch主键字段,可以为空，默认使用数据库主键
+    meilisearch_searchable_attrs:  #MeiliSearch可搜索字段,用逗号分隔,可以为空，默认全部字段可搜索
+    meilisearch_filterable_attrs:  #MeiliSearch可过滤字段,用逗号分隔,可以为空
+    meilisearch_sortable_attrs: id,create_time,update_time #MeiliSearch可排序字段,用逗号分隔,可以为空
     #redis相关
-    redis_structure: string # 数据类型。 支持string、hash、list、set、sortedset类型(与redis的数据类型一致)
+    # redis_structure: string # 数据类型。 支持string、hash、list、set、sortedset类型(与redis的数据类型一致)
     #redis_key_prefix: USER_ #key的前缀
     #redis_key_column: USER_NAME #使用哪个列的值作为key，不填写默认使用主键
     #redis_key_formatter: '{{.ID}}|{{.USER_NAME}}'
@@ -125,5 +133,11 @@ rule:
 
     #rabbitmq相关
     #rabbitmq_queue: user_topic #queue名称,可以为空，默认使用表(Table)名称
+
+    #meilisearch相关
+    #meilisearch_index: user_index #MeiliSearch索引名称,可以为空，默认使用表(Table)名称
+    #meilisearch_primary_key: id #MeiliSearch主键字段,可以为空，默认使用数据库主键
+    #meilisearch_searchable_attrs: name,email,description #MeiliSearch可搜索字段,用逗号分隔,可以为空，默认全部字段可搜索
+    #meilisearch_filterable_attrs: status,category_id #MeiliSearch可过滤字段,用逗号分隔,可以为空
 
     #reserve_raw_data: true #保留update之前的数据，针对rocketmq、kafka、rabbitmq有用;默认为false

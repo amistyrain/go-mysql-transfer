@@ -41,6 +41,7 @@ const (
 	_targetRabbitmq      = "RABBITMQ"
 	_targetKafka         = "KAFKA"
 	_targetElasticsearch = "ELASTICSEARCH"
+	_targetMeilisearch   = "MEILISEARCH"
 	_targetScript        = "SCRIPT"
 
 	RedisGroupTypeSentinel = "sentinel"
@@ -124,6 +125,10 @@ type Config struct {
 	ElsUser     string `yaml:"es_user"`     //Elasticsearch用户名
 	ElsPassword string `yaml:"es_password"` //Elasticsearch密码
 	ElsVersion  int    `yaml:"es_version"`  //Elasticsearch版本，支持6和7、默认为7
+	
+	// ------------------- MEILISEARCH -----------------
+	MeilisearchHost   string `yaml:"meilisearch_host"`   //MeiliSearch主机地址，如：http://localhost:7700
+	MeilisearchApiKey string `yaml:"meilisearch_api_key"` //MeiliSearch API密钥
 
 	isReserveRawData bool //保留原始数据
 	isMQ             bool //是否消息队列
@@ -182,6 +187,10 @@ func initConfig(fileName string) error {
 		}
 	case _targetElasticsearch:
 		if err := checkElsConfig(&c); err != nil {
+			return errors.Trace(err)
+		}
+	case _targetMeilisearch:
+		if err := checkMeilisearchConfig(&c); err != nil {
 			return errors.Trace(err)
 		}
 	case _targetScript:
@@ -449,6 +458,10 @@ func (c *Config) IsScript() bool {
 	return strings.ToUpper(c.Target) == _targetScript
 }
 
+func (c *Config) IsMeilisearch() bool {
+	return strings.ToUpper(c.Target) == _targetMeilisearch
+}
+
 func (c *Config) IsExporterEnable() bool {
 	return c.EnableExporter
 }
@@ -488,6 +501,10 @@ func (c *Config) Destination() string {
 		des += "elasticsearch("
 		des += c.ElsAddr
 		des += ")"
+	case _targetMeilisearch:
+		des += "meilisearch("
+		des += c.MeilisearchHost
+		des += ")"
 	case _targetScript:
 		des += "Lua Script"
 	}
@@ -508,6 +525,8 @@ func (c *Config) DestStdName() string {
 		return "Kafka"
 	case _targetElasticsearch:
 		return "Elasticsearch"
+	case _targetMeilisearch:
+		return "MeiliSearch"
 	}
 
 	return ""
@@ -527,6 +546,8 @@ func (c *Config) DestAddr() string {
 		return c.KafkaAddr
 	case _targetElasticsearch:
 		return c.ElsAddr
+	case _targetMeilisearch:
+		return c.MeilisearchHost
 	}
 
 	return ""
@@ -554,4 +575,16 @@ func (c *Config) ZkElectedDir() string {
 
 func (c *Config) ZkNodesDir() string {
 	return _zkRootDir + "/" + c.Cluster.Name + "/nodes"
+}
+
+func checkMeilisearchConfig(c *Config) error {
+	if len(c.MeilisearchHost) == 0 {
+		return errors.Errorf("empty meilisearch_host not allowed")
+	}
+
+	if !strings.HasPrefix(c.MeilisearchHost, "http") {
+		c.MeilisearchHost = "http://" + c.MeilisearchHost
+	}
+
+	return nil
 }
