@@ -126,6 +126,7 @@ type Rule struct {
 	MeilisearchPrimaryKey      string `yaml:"meilisearch_primary_key"`       //MeiliSearch主键字段,可以为空，默认使用数据库主键
 	MeilisearchSearchableAttrs string `yaml:"meilisearch_searchable_attrs"`  //MeiliSearch可搜索字段,用逗号分隔,可以为空，默认全部字段可搜索
 	MeilisearchFilterableAttrs string `yaml:"meilisearch_filterable_attrs"`  //MeiliSearch可过滤字段,用逗号分隔,可以为空
+	MeilisearchSortableAttrs   string `yaml:"meilisearch_sortable_attrs"`    //MeiliSearch可排序字段,用逗号分隔,可以为空
 
 	// --------------- no config ----------------
 	TableInfo             *schema.Table

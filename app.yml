@@ -96,6 +96,7 @@ rule:
     meilisearch_primary_key: id #MeiliSearch主键字段,可以为空，默认使用数据库主键
     meilisearch_searchable_attrs:  #MeiliSearch可搜索字段,用逗号分隔,可以为空，默认全部字段可搜索
     meilisearch_filterable_attrs:  #MeiliSearch可过滤字段,用逗号分隔,可以为空
+    meilisearch_sortable_attrs: id,create_time,update_time #MeiliSearch可排序字段,用逗号分隔,可以为空
     #redis相关
     # redis_structure: string # 数据类型。 支持string、hash、list、set、sortedset类型(与redis的数据类型一致)
     #redis_key_prefix: USER_ #key的前缀

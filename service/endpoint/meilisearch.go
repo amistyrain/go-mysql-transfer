@@ -135,6 +135,22 @@ func (s *MeilisearchEndpoint) createOrUpdateIndex(rule *global.Rule) error {
 		}
 	}
 
+	// 设置可排序属性
+	if rule.MeilisearchSortableAttrs != "" {
+		sortableAttrs := strings.Split(rule.MeilisearchSortableAttrs, ",")
+		for i, attr := range sortableAttrs {
+			sortableAttrs[i] = strings.TrimSpace(attr)
+		}
+		task, err := index.UpdateSortableAttributes(&sortableAttrs)
+		if err != nil {
+			return err
+		}
+		_, err = s.client.WaitForTask(task.TaskUID)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
